@@ -37,7 +37,7 @@ Triton support differnt backends, including Python backend and OpenLLM and vLLM 
 
 LLMs promise to fundamentally change how we use AI across all industries. However, actually serving these models is challenging and can be surprisingly slow even on expensive hardware. Today we are excited to introduce vLLM, an open-source library for fast LLM inference and serving. vLLM utilizes PagedAttention, our new attention algorithm that effectively manages attention keys and values. vLLM equipped with PagedAttention redefines the new state of the art in LLM serving: it delivers up to 24x higher throughput than HuggingFace Transformers, without requiring any model architecture changes.
 
-Based on tests, vLLM 
+Based on tests, vLLM batch inference performance much faster than Huggingface Text Generation Inference(TGI), also performs bettern than Triton Inference Server Python Backend
 
 ## Summary:
 This tutorial walks through how to setup Llama2 and other hugging face based LLM models through Nvidia Inference Server based on GKE and GPU(Nvidia T4, L4 etc)
@@ -49,7 +49,7 @@ Huggingface account settings with HF API Token. You also need to have access per
 GCP project and access
 You may need to raise GPU quota for L4
 
-### Download the github repo, https://github.com/gke-ai-mi/llama2-inference/
+### Download the github repo, 
 ```
 git clone https://github.com/llm-on-gke/triton-vllm-gke
 cd $PWD/triton-vllm-gke
@@ -79,7 +79,7 @@ Review and validate the following model configuration file under model_repositor
 Run the following commands to upload model repository, replace your-bucket-name
 ```
 gsutil mb gs://your-bucket-name
-gsutil cp model_repository -r gs://your-bucket-name/model_repository
+gsutil cp -r model_repository gs://your-bucket-name/model_repository
 ```
 
 ### Run cloud build to create testing container images:
