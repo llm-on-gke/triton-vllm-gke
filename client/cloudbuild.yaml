@@ -1,0 +1,12 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: Build Image
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      docker build . -t us-east1-docker.pkg.dev/rick-vertex-ai/triton-llm/vllm-client:latest  \
+      && docker push us-east1-docker.pkg.dev/rick-vertex-ai/triton-llm/vllm-client:latest 
+ 
+images:
+- 'us-east1-docker.pkg.dev/rick-vertex-ai/triton-llm/vllm-client:latest'

@@ -1,0 +1,127 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: triton-inference-server
+  labels:
+    app: triton-inference-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: triton-inference-server
+  template:
+    metadata:
+      labels:
+        app: triton-inference-server
+    spec:
+      volumes:
+       - name: cache
+         emptyDir: {}
+       - name: dshm
+         emptyDir:
+              medium: Memory
+      nodeSelector:
+        cloud.google.com/gke-accelerator: nvidia-l4
+      serviceAccountName: triton
+      containers:
+        - name: triton-inference-server
+          image: nvcr.io/nvidia/tritonserver:23.10-vllm-python-py3
+          imagePullPolicy: IfNotPresent
+
+          resources:
+            limits:
+              nvidia.com/gpu: 2
+          env:
+            - name: LD_PRELOAD
+              value: ''
+            - name: TRANSFORMERS_CACHE
+              value: /home/triton-server/.cache
+            - name: shm-size
+              value: 5g
+            - name: HUGGING_FACE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: llama2
+                  key: HF_TOKEN
+            - name: NCCL_IGNORE_DISABLED_P2P
+              value: '1'
+          args: ["tritonserver", "--model-store=gs://triton-inference-llm-repos/model_repository",
+                 "--strict-model-config=False",
+                 "--log-verbose=1",
+                 "--allow-gpu-metrics=True"]
+          ports:
+            - containerPort: 8000
+              name: http
+            - containerPort: 8001
+              name: grpc
+            - containerPort: 8002
+              name: metrics
+          livenessProbe:
+            httpGet:
+              path: /v2/health/live
+              port: http
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /v2/health/ready
+              port: http
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+
+          securityContext:
+            runAsUser: 1000
+          volumeMounts:
+            - mountPath: /home/triton-server/.cache
+              name: cache
+            - mountPath: /dev/shm
+              name: dshm
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: triton-inference-server
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+  labels:
+    app: triton-inference-server   
+spec:
+  type: NodePort
+  ports:
+    - port: 8000
+      targetPort: http
+      name: http-inference-server
+    - port: 8001
+      targetPort: grpc
+      name: grpc-inference-server
+    - port: 8002
+      targetPort: metrics
+      name: metrics-inference-server
+  selector:
+    app: triton-inference-server
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: triton-external
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "ingress-triton"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: "/"
+        pathType: Prefix
+        backend:
+          service:
+            name: triton-inference-server
+            port:
+              number: 8000
+             
