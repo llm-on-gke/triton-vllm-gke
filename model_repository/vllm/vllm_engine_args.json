@@ -1,6 +1,0 @@
-{
-    "model":"meta-llama/Llama-2-13b-chat-hf",
-    "disable_log_requests": "true",
-    "tensor_parallel_size": 2,
-    "gpu_memory_utilization": 0.8
-}

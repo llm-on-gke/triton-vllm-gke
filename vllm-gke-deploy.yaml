@@ -44,7 +44,7 @@ spec:
                   name: huggingface
                   key: HF_TOKEN
             - name: model
-              value: mistralai/Mistral-7B-v0.1
+              value: meta-llama/Llama-2-7b-chat-hf
             - name: dtype
               value: 'float16'
             - name: tensor_parallel_size
