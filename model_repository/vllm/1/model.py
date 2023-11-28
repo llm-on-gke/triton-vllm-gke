@@ -44,9 +44,7 @@ class TritonPythonModel:
           "disable_log_requests": "true",
           "tensor_parallel_size": os.environ.get('tensor_parallel_size', 1),
           "gpu_memory_utilization":  os.environ.get('gpu_memory_utilization', 0.9),
-          "dtype":  os.environ.get('dtype', 'auto'),
-          "quantization":  os.environ.get('quantization', 'None'),
-
+          "dtype":  os.environ.get('dtype', 'auto')
         } 
         # Create an AsyncLLMEngine from the config from JSON
         self.llm_engine = AsyncLLMEngine.from_engine_args(
