@@ -41,8 +41,10 @@ spec:
             - name: HUGGING_FACE_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: llama2
+                  name: huggingface
                   key: HF_TOKEN
+            - name: model
+              value: 5g
             - name: NCCL_IGNORE_DISABLED_P2P
               value: '1'
           args: ["tritonserver", "--model-store=gs://triton-inference-llm-repos/model_repository",

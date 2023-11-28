@@ -34,12 +34,20 @@ class TritonPythonModel:
         engine_args_filepath = os.path.join(
             args["model_repository"], _VLLM_ENGINE_ARGS_FILENAME
         )
-        assert os.path.isfile(
-            engine_args_filepath
-        ), f"'{_VLLM_ENGINE_ARGS_FILENAME}' containing vllm engine args must be provided in '{args['model_repository']}'"
-        with open(engine_args_filepath) as file:
-            vllm_engine_config = json.load(file)
+        #assert os.path.isfile(
+        #    engine_args_filepath
+        #), f"'{_VLLM_ENGINE_ARGS_FILENAME}' containing vllm engine args must be provided in '{args['model_repository']}'"
+        #with open(engine_args_filepath) as file:
+        #    vllm_engine_config = json.load(file)
+        vllm_engine_config ={      
+          "model": os.environ.get('model_name', 'mistralai/Mistral-7B-v0.1'),
+          "disable_log_requests": "true",
+          "tensor_parallel_size": os.environ.get('tensor_parallel_size', 1),
+          "gpu_memory_utilization":  os.environ.get('gpu_memory_utilization', 0.9),
+          "dtype":  os.environ.get('dtype', 'auto'),
+          "quantization":  os.environ.get('quantization', 'None'),
 
+        } 
         # Create an AsyncLLMEngine from the config from JSON
         self.llm_engine = AsyncLLMEngine.from_engine_args(
             AsyncEngineArgs(**vllm_engine_config)

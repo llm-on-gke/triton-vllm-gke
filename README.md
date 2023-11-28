@@ -98,7 +98,7 @@ Execute the command to deploy inference deployment in GKE, update the HF_TOKEN v
 ```
 gcloud container clusters get-credentials llm-inference-l4 --location us-central1
 export HF_TOKEN=<paste-your-own-token>
-kubectl create secret generic llama2 --from-literal="HF_TOKEN=$HF_TOKEN" -n triton
+kubectl create secret generic huggingface --from-literal="HF_TOKEN=$HF_TOKEN" -n triton
 kubectl apply -f llama2-gke-deploy.yaml -n triton
 ```
 ### Test out the batch inference:
