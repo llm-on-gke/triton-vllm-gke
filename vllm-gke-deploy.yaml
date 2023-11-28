@@ -21,7 +21,7 @@ spec:
          emptyDir:
               medium: Memory
       nodeSelector:
-        cloud.google.com/gke-accelerator: nvidia-l4
+        cloud.google.com/gke-accelerator: nvidia-tesla-t4
       serviceAccountName: triton
       containers:
         - name: triton-inference-server
@@ -44,7 +44,13 @@ spec:
                   name: huggingface
                   key: HF_TOKEN
             - name: model
-              value: 5g
+              value: mistralai/Mistral-7B-v0.1
+            - name: dtype
+              value: 'float16'
+            - name: tensor_parallel_size
+              value: '2'
+            - name: gpu_memory_utilization
+              value: '0.8'
             - name: NCCL_IGNORE_DISABLED_P2P
               value: '1'
           args: ["tritonserver", "--model-store=gs://triton-inference-llm-repos/model_repository",

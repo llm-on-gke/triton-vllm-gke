@@ -66,15 +66,6 @@ comment out the following lines if you need public instead of private cluster:
 ```
 ./create-cluster.sh
 ```
-### Update and upload the Llama 2 Model repository files.
-Review and validate the following model configuration file under model_repository/vllm/1/vllm_engine_args.json, you may update model names, tensor_parralle_size for muti-gpu within a node
-
-{
-    "model":"meta-llama/Llama-2-13b-chat-hf",
-    "disable_log_requests": "true",
-    "tensor_parallel_size": 2,
-    "gpu_memory_utilization": 0.8
-}
 
 Run the following commands to upload model repository, replace your-bucket-name
 ```
@@ -94,6 +85,8 @@ Update the following line in llama2-gke-deploy.yaml file, with your model reposi
 
 args: ["tritonserver", "--model-store=gs://your-bucket-name/model_repository"
 Execute the command to deploy inference deployment in GKE, update the HF_TOKEN values
+
+
 
 ```
 gcloud container clusters get-credentials llm-inference-l4 --location us-central1
