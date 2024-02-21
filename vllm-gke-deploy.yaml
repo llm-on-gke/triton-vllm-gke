@@ -30,7 +30,7 @@ spec:
 
           resources:
             limits:
-              nvidia.com/gpu: 2
+              nvidia.com/gpu: 1
           env:
             - name: LD_PRELOAD
               value: ''
@@ -47,6 +47,7 @@ spec:
               value: '1'
           args: ["tritonserver", "--model-store=gs://triton-inference-llm-repos/model_repository",
                  "--strict-model-config=False",
+                 "model_name=google/gemma-7b",
                  "--log-verbose=1",
                  "--allow-gpu-metrics=True"]
           ports:
