@@ -12,9 +12,10 @@ from vllm.engine.async_llm_engine import AsyncLLMEngine
 from vllm.utils import random_uuid
 import huggingface_hub
 
+
 _VLLM_ENGINE_ARGS_FILENAME = "vllm_engine_args.json"
 huggingface_hub.login(token=os.environ.get('HUGGING_FACE_TOKEN', '')) ## Add your HF credentials
-
+huggingface_hub.download(repo_id="google/gemma-7b", repo_type="model", local_dir="/data/")
 
 class TritonPythonModel:
     def initialize(self, args):
@@ -40,7 +41,7 @@ class TritonPythonModel:
         #with open(engine_args_filepath) as file:
         #    vllm_engine_config = json.load(file)
         vllm_engine_config ={      
-          "model": os.environ.get('model_name', 'mistralai/Mistral-7B-v0.1'),
+          "model": "/data",
           "disable_log_requests": "true",
           "tensor_parallel_size": int(os.environ.get('tensor_parallel_size',1)),
           "gpu_memory_utilization":  float(os.environ.get('gpu_memory_utilization', '0.9')),

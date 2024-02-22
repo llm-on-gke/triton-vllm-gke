@@ -20,12 +20,15 @@ spec:
        - name: dshm
          emptyDir:
               medium: Memory
+       - name: data
+         persistentVolumeClaim:
+          claimName: model-data
       nodeSelector:
         cloud.google.com/gke-accelerator: nvidia-l4
       serviceAccountName: triton
       containers:
         - name: triton-inference-server
-          image: nvcr.io/nvidia/tritonserver:23.10-vllm-python-py3
+          image: nvcr.io/nvidia/tritonserver:24.01-vllm-python-py3
           imagePullPolicy: IfNotPresent
 
           resources:
@@ -81,6 +84,8 @@ spec:
               name: cache
             - mountPath: /dev/shm
               name: dshm
+            - mountPath: "/data"
+              name: data
 
 ---
 apiVersion: v1
