@@ -45,9 +45,10 @@ spec:
                   key: HF_TOKEN
             - name: NCCL_IGNORE_DISABLED_P2P
               value: '1'
+            - name: model_name
+              value: google/gemma-7b
           args: ["tritonserver", "--model-store=gs://triton-inference-llm-repos/model_repository",
                  "--strict-model-config=False",
-                 "model_name=google/gemma-7b",
                  "--log-verbose=1",
                  "--allow-gpu-metrics=True"]
           ports:
