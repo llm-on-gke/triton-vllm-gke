@@ -20,9 +20,6 @@ spec:
        - name: dshm
          emptyDir:
               medium: Memory
-       - name: data
-         persistentVolumeClaim:
-          claimName: model-data
       nodeSelector:
         cloud.google.com/gke-accelerator: nvidia-l4
       serviceAccountName: triton
@@ -84,8 +81,6 @@ spec:
               name: cache
             - mountPath: /dev/shm
               name: dshm
-            - mountPath: "/data"
-              name: data
 
 ---
 apiVersion: v1

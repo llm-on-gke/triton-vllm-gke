@@ -41,7 +41,7 @@ class TritonPythonModel:
         #with open(engine_args_filepath) as file:
         #    vllm_engine_config = json.load(file)
         vllm_engine_config ={      
-          "model": "/data",
+          "model": os.environ.get('model_name', 'mistralai/Mistral-7B-v0.1'),
           "disable_log_requests": "true",
           "tensor_parallel_size": int(os.environ.get('tensor_parallel_size',1)),
           "gpu_memory_utilization":  float(os.environ.get('gpu_memory_utilization', '0.9')),
