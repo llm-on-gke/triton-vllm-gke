@@ -25,7 +25,7 @@ spec:
       serviceAccountName: triton
       containers:
         - name: triton-inference-server
-          image: nvcr.io/nvidia/tritonserver:24.01-vllm-python-py3
+          image: nvcr.io/nvidia/tritonserver:24.02-vllm-python-py3
           imagePullPolicy: IfNotPresent
 
           resources:
@@ -50,7 +50,7 @@ spec:
           args: ["tritonserver", "--model-store=gs://triton-inference-llm-repos/model_repository",
                  "--strict-model-config=False",
                  "--log-verbose=1",
-                 "--allow-gpu-metrics=True"]
+                 "--allow-metrics=True"]
           ports:
             - containerPort: 8000
               name: http

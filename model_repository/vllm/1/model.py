@@ -15,7 +15,7 @@ import huggingface_hub
 
 _VLLM_ENGINE_ARGS_FILENAME = "vllm_engine_args.json"
 huggingface_hub.login(token=os.environ.get('HUGGING_FACE_TOKEN', '')) ## Add your HF credentials
-huggingface_hub.download(repo_id="google/gemma-7b", repo_type="model", local_dir="/data/")
+#huggingface_hub.download(repo_id="google/gemma-7b", repo_type="model", local_dir="/data/")
 
 class TritonPythonModel:
     def initialize(self, args):
