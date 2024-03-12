@@ -1,4 +1,4 @@
-# for L4 and spot node-pools
+# GKE Autopilot
 export PROJECT_ID=<your-project-id>
 export REGION=us-central1
 export ZONE_1=${REGION}-a # You may want to change the zone letter based on the region you selected above

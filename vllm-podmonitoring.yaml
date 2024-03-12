@@ -1,0 +1,11 @@
+apiVersion: monitoring.googleapis.com/v1
+kind: PodMonitoring
+metadata:
+  name: triton-inference
+spec:
+  selector:
+    matchLabels:
+       app: triton-inference-server
+  endpoints:
+  - port: metrics
+    interval: 10s

@@ -56,12 +56,9 @@ cd $PWD/triton-vllm-gke
 chmod +x create-cluster.sh
 ```
 ### Create the GKE cluster
-update the create-cluster.sh script with write parameters, and provision GKE cluster
+update the create-autopilot-cluster.sh script with write parameters, and provision GKE cluster
 comment out the following lines if you need public instead of private cluster:
-  --enable-ip-alias \
-  --enable-private-nodes  \
-  --master-ipv4-cidr 172.16.0.32/28 \
-  --scopes="gke-default,storage-rw"
+
 
 ```
 ./create-cluster.sh
@@ -89,14 +86,14 @@ Execute the command to deploy inference deployment in GKE, update the HF_TOKEN v
 
 
 ```
-gcloud container clusters get-credentials llm-inference-l4 --location us-central1
+gcloud container clusters get-credentials triton-inference --location us-central1
 export HF_TOKEN=<paste-your-own-token>
 kubectl create secret generic huggingface --from-literal="HF_TOKEN=$HF_TOKEN" -n triton
 kubectl apply -f llama2-gke-deploy.yaml -n triton
 ```
 ### Test out the batch inference:
 ```
-kubectl run -it -n triton --image us-east1-docker.pkg.dev/your-project/triton-llm/vllm-client bash 
+kubectl run -it -n triton --image us-east1-docker.pkg.dev/your-project/gke-llm/triton-client bash 
 ```
 
 Once you in the container, update the client.py with the endpoint with the Service IP of generated. 
@@ -105,3 +102,5 @@ Then run the following command inside the testing container:
 python3 client.py
 ```
 If everything runs smoothly, there will be a results.txt file generated, you may check the contents of 
+
+### Monitoring and metrics:
