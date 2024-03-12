@@ -23,6 +23,7 @@ spec:
       nodeSelector:
         cloud.google.com/compute-class: "Accelerator"
         cloud.google.com/gke-accelerator: nvidia-l4
+        cloud.google.com/gke-spot: "true"
       serviceAccountName: triton
       containers:
         - name: triton-inference-server
