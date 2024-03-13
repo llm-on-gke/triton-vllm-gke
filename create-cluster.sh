@@ -1,5 +1,6 @@
 # GKE Autopilot
 export PROJECT_ID=<your-project-id>
+export HF_TOKEN=<paste-your-own-token>
 export REGION=us-central1
 export ZONE_1=${REGION}-a # You may want to change the zone letter based on the region you selected above
 export ZONE_2=${REGION}-b # You may want to change the zone letter based on the region you selected above
@@ -38,3 +39,7 @@ gcloud iam service-accounts add-iam-policy-binding triton-server@${PROJECT_ID}.i
 kubectl annotate serviceaccount triton \
     --namespace triton \
     iam.gke.io/gcp-service-account=triton-server@${PROJECT_ID}.iam.gserviceaccount.com
+
+kubectl create secret generic huggingface --from-literal="HF_TOKEN=$HF_TOKEN" -n $NAMESPACE
+
+kubectl apply -f vllm-podmonitoring.yaml -n $NAMESPACE

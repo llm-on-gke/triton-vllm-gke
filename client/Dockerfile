@@ -24,7 +24,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-FROM nvcr.io/nvidia/tritonserver:23.10-py3-sdk
+FROM nvcr.io/nvidia/tritonserver:24.02-py3-sdk
 WORKDIR /workspace
 
 COPY http-client.py ./
