@@ -3,6 +3,7 @@ import asyncio
 import queue
 import sys
 from os import system
+import os
 import json
 import time
 import numpy as np
@@ -127,7 +128,7 @@ if __name__ == "__main__":
         "--url",
         type=str,
         required=False,
-        default="localhost:8001",
+        default=os.environ['TRITON_INFERENCE_SERVER_SERVICE_HOST']+":8001",
         help="Inference server URL and it gRPC port. Default is localhost:8001.",
     )
     parser.add_argument(
