@@ -2,9 +2,10 @@ from tritonclient.utils import *
 import tritonclient.http as httpclient
 import time
 import numpy as np
+import os
 
 tm1 = time.perf_counter()
-with httpclient.InferenceServerClient(url="localhost:8000", verbose=False, concurrency=32) as client:
+with httpclient.InferenceServerClient(url=os.environ['TRITON_INFERENCE_SERVER_SERVICE_HOST']+":8000", verbose=False, concurrency=32) as client:
     
     # Define input config
     input_text =[["Where is Uruguay?"],
