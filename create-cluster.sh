@@ -29,16 +29,20 @@ gcloud container node-pools create $CLUSTER_NAME-pool --cluster \
 $CLUSTER_NAME --accelerator type=nvidia-l4,count=1,gpu-driver-version=latest   --machine-type g2-standard-8 \
 --ephemeral-storage-local-ssd=count=1   --enable-autoscaling --enable-image-streaming   --num-nodes=0 --min-nodes=0 --max-nodes=3 \
 --shielded-secure-boot   --shielded-integrity-monitoring --node-version=1.28 --node-locations $ZONE_1,$ZONE_2 --region $REGION --spot
-
+TRITON_SA=triton-server
+gcloud iam service-accounts create $TRITON_SA --display-name "Triton Server Service Account"
+for role in monitoring.metricWriter stackdriver.resourceMetadata.writer; do
+  gcloud projects add-iam-policy-binding $PROJECT_ID --member=serviceAccount:${TRITON_SA}@${PROJECT_ID}.iam.gserviceaccount.com --role=roles/${role}
+done
 kubectl create ns triton
 kubectl create serviceaccount triton --namespace triton
-gcloud iam service-accounts add-iam-policy-binding triton-server@${PROJECT_ID}.iam.gserviceaccount.com \
+gcloud iam service-accounts add-iam-policy-binding ${TRITON_SA}@${PROJECT_ID}.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
     --member "serviceAccount:${PROJECT_ID}.svc.id.goog[triton/triton]"
 
 kubectl annotate serviceaccount triton \
     --namespace triton \
-    iam.gke.io/gcp-service-account=triton-server@${PROJECT_ID}.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account=${TRITON_SA}@${PROJECT_ID}.iam.gserviceaccount.com
 
 kubectl create secret generic huggingface --from-literal="HF_TOKEN=$HF_TOKEN" -n $NAMESPACE
 
