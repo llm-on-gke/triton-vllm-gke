@@ -56,9 +56,7 @@ cd $PWD/triton-vllm-gke
 chmod +x create-cluster.sh
 ```
 ### Create the GKE cluster
-update the create-autopilot-cluster.sh script with write parameters, and provision GKE cluster
-comment out the following lines if you need public instead of private cluster:
-
+update the create-cluster.sh script, to replace proper values for PROJECT_ID and HF_TOKEN
 
 ```
 ./create-cluster.sh
@@ -70,37 +68,87 @@ gsutil mb gs://your-bucket-name
 gsutil cp -r model_repository gs://your-bucket-name/model_repository
 ```
 
-### Run cloud build to create testing container images:
+### Deploy kubernetes resources into GKE cluster
+update the vllm-gke-deploy.yaml file if necessary:
+right model name env:
+env:
+   - name: model_name
+              value: meta-llama/Llama-2-7b-chat-hf
+
+Update model repository URI in cloud storage:
+
+args: ["tritonserver", "--model-store=gs://your-bucket-name/model_repository"
+Execute the command to deploy inference deployment in GKE, update the HF_TOKEN values
+
+```
+kubectl apply -f vllm-gke-deploy.yaml -n triton
+```
+### Test out the batch inference:
+#### Run cloud build to create testing container images:
 Run following command to build testing client container to test llama 2 batch inference:
 
 ```
 cd client
 gcloud builds submit .
 ```
-### Deploy kubernetes resources into GKE cluster
-Update the following line in llama2-gke-deploy.yaml file, with your model repository URI in cloud storage:
-
-args: ["tritonserver", "--model-store=gs://your-bucket-name/model_repository"
-Execute the command to deploy inference deployment in GKE, update the HF_TOKEN values
-
-
-
+#### test GRPC client
 ```
-gcloud container clusters get-credentials triton-inference --location us-central1
-export HF_TOKEN=<paste-your-own-token>
-kubectl create secret generic huggingface --from-literal="HF_TOKEN=$HF_TOKEN" -n triton
-kubectl apply -f llama2-gke-deploy.yaml -n triton
-```
-### Test out the batch inference:
-```
-kubectl run -it -n triton --image us-east1-docker.pkg.dev/your-project/gke-llm/triton-client bash 
+kubectl run -it -n triton --image us-east1-docker.pkg.dev/your-project/gke-llm/triton-client --env="triton_ip=$TRITON_IP" triton-client 
 ```
 
-Once you in the container, update the client.py with the endpoint with the Service IP of generated. 
+```
+kubectl exec -it -n triton triton-client -- bash
+```
+
+Once you in the container, update the grpc-client.py with the endpoint with the Service IP of generated. 
 Then run the following command inside the testing container:
 ```
-python3 client.py
+curl $TRITON_INFERENCE_SERVER_SERVICE_HOST:8000/v2
+url $TRITON_INFERENCE_SERVER_SERVICE_HOST:8002/metrics
+python3 grpc-client.py
 ```
 If everything runs smoothly, there will be a results.txt file generated, you may check the contents of 
 
-### Monitoring and metrics:
+### Retrieve metrics from Triton Inference server port 8002:
+Check the metrics exposed by Triton Inference Server, 
+```
+kubectl exec -it -n triton bash -- bash
+```
+
+Then run the following:
+```
+curl SERVICEIP:8002/metrics
+```
+
+You should see a list of metrics starting with nv_XXX
+
+
+### Intialize GMP settings
+run the following command, 
+```
+gcloud container clusters get-credentials triton-inference --location us-central1
+kubectl edit operatorconfig -n gmp-public
+```
+
+Add the following section right above line start with metadata:
+
+features:
+      targetStatus:
+        enabled: true
+
+
+Then run the following command to create GMP PodMonitoring resource targeting deployed triton inference server.
+```
+gcloud container clusters get-credentials triton-inference --location us-central1
+kubectl -n triton apply -f vllm-podmonitoring.yaml
+```
+
+#### Use cloud monitoring metric explorer to display Model inference metrics:
+Go to Monitoring/Metric Explorer, switch to PromQL on the right side of console. 
+In the query window, type nv_, you will see a list of Nvidia triton metrics available. 
+
+Choose one of NV_ metric, and Click "Run QUery" button on right side, you will see the chart of this metric. 
+
+### Use Grafana to visualize Model inference monitoring metrics
+
+
