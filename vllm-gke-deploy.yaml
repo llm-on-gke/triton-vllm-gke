@@ -21,23 +21,14 @@ spec:
          emptyDir:
               medium: Memory
       nodeSelector:
-        cloud.google.com/compute-class: "Accelerator"
         cloud.google.com/gke-accelerator: nvidia-l4
-        cloud.google.com/gke-spot: "true"
       serviceAccountName: triton
       containers:
         - name: triton-inference-server
           image: nvcr.io/nvidia/tritonserver:24.02-vllm-python-py3
           imagePullPolicy: IfNotPresent
-
           resources:
-            requests:
-              cpu: "2"
-              memory: "50Gi"
-              nvidia.com/gpu: 1
             limits:
-              cpu: "2"
-              memory: "50Gi"
               nvidia.com/gpu: 1
           env:
             - name: LD_PRELOAD
@@ -54,7 +45,7 @@ spec:
             - name: NCCL_IGNORE_DISABLED_P2P
               value: '1'
             - name: model_name
-              value: google/gemma-7b
+              value: meta-llama/Llama-2-7b-chat-hf
           args: ["tritonserver", "--model-store=gs://triton-inference-llm-repos/model_repository",
                  "--strict-model-config=False",
                  "--log-verbose=1",
